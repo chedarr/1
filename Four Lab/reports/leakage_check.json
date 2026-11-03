@@ -1,0 +1,38 @@
+{
+ "scaler_fit_on_train_only": true,
+ "scaler_mean_diff": 1.5210019910227857e-06,
+ "windows_cross_split_boundaries": false,
+ "windows_crossing_selected": 0,
+ "windows_crossing_excluded": 0,
+ "forbidden_columns_used": [],
+ "target_in_features": true,
+ "target_feature": "PHT10180_mean",
+ "feature_columns": [
+  "PHT10080_mean",
+  "PHT10100_mean",
+  "PHT10180_mean",
+  "PHT10260_mean",
+  "PHT10300_mean"
+ ],
+ "future_values_in_input": false,
+ "lookback": 144,
+ "horizon": 144,
+ "train_rows": [
+  0,
+  161836
+ ],
+ "val_rows": [
+  161836,
+  196515
+ ],
+ "test_rows": [
+  196515,
+  231194
+ ],
+ "windows": {
+  "train": 13384,
+  "val": 2842,
+  "test": 2866
+ },
+ "all_checks_passed": true
+}

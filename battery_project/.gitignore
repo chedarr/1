@@ -1,0 +1,71 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+
+# --- Виртуальные окружения ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- IDE ---
+.idea/
+.vscode/
+*.swp
+*~
+
+# --- Jupyter ---
+.ipynb_checkpoints/
+
+# --- Данные (~198 МБ; пересобираются из data/raw скриптами) ---
+data/raw/
+data/interim/
+data/processed/
+
+# --- Модели ---
+*.keras
+*.h5
+*.pkl
+*.joblib
+
+# --- Логи и временные файлы ---
+*.log
+*.tmp
+*.bak
+*.old
+~$*
+desktop.ini
+
+# --- Архивы ---
+*.7z
+*.zip
+
+# --- Мусор ---
+_trash/
+
+# --- ОС ---
+Thumbs.db
+.DS_Store
+
+# --- Секреты ---
+.env
+.env.*
+!.env.example
+
+# ============================================================
+# ШАБЛОНЫ И НОВЫЕ ДОКУМЕНТЫ (не коммитим)
+# ============================================================
+templates/
+docs_new/

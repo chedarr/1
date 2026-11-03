@@ -1,0 +1,2252 @@
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Лабораторная работа №1 — Регрессия нейросетями</title>
+    <link rel="stylesheet" href="lab1_process.css"/>
+  </head>
+  <body>
+    <header id="top">
+      <h1>Лабораторная работа №1 — Регрессия нейросетями</h1>
+      <p class="meta">студент ·
+            2026-09-23 ·
+            версия схемы 1.0</p>
+    </header>
+    <nav class="toc">
+      <h2>Содержание</h2>
+      <ol>
+        <li>
+          <a href="#s1">Метаданные</a>
+        </li>
+        <li>
+          <a href="#s2">Хронология</a>
+        </li>
+        <li>
+          <a href="#s3">Сущности</a>
+        </li>
+        <li>
+          <a href="#s4">Файлы</a>
+        </li>
+        <li>
+          <a href="#s5">Формулы</a>
+        </li>
+        <li>
+          <a href="#s6">Процессы</a>
+        </li>
+        <li>
+          <a href="#s7">Проверки</a>
+        </li>
+        <li>
+          <a href="#s8">Результаты</a>
+        </li>
+        <li>
+          <a href="#s9">Базовые предсказатели</a>
+        </li>
+        <li>
+          <a href="#s10">Ссылки</a>
+        </li>
+        <li>
+          <a href="#s11">Приложение</a>
+        </li>
+      </ol>
+    </nav>
+    <section id="s1">
+      <h2>1. Метаданные</h2>
+      <table class="kv">
+        <tr>
+          <th>Поле</th>
+          <th>Значение</th>
+        </tr>
+        <tr>
+          <td>Датасет</td>
+          <td>NASA PCoE Battery Dataset</td>
+        </tr>
+        <tr>
+          <td>Число батарей</td>
+          <td>34</td>
+        </tr>
+        <tr>
+          <td>Разрядных циклов</td>
+          <td>2769</td>
+        </tr>
+        <tr>
+          <td>Тип задачи</td>
+          <td>regression</td>
+        </tr>
+        <tr>
+          <td>Стек</td>
+          <td>Python 3.13, TensorFlow, scikit-learn, pandas, numpy, lxml</td>
+        </tr>
+        <tr>
+          <td>seed</td>
+          <td>42</td>
+        </tr>
+      </table>
+    </section>
+    <section id="s2">
+      <h2>2. Хронология (10 этапов)</h2>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 1.</span>Подготовка</h3>
+        <p class="desc">Скачивание/размещение данных NASA PCoE Battery Dataset, установка пакетов, создание структуры проекта.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">NASA PCoE Battery Dataset (.mat, 34 файла)</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/raw/*.mat (34 файла)</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">data/raw/B0005.mat</code>
+          <code class="io-item">data/raw/B0006.mat</code>
+          <code class="io-item">data/raw/B0045.mat</code>
+        </p>
+        <p class="io">
+          <strong>Ссылки:</strong>
+          <a class="io-item" href="https://phm-datasets.s3.amazonaws.com/NASA/5.+Battery+Data+Set.zip">https://phm-datasets.s3.amazonaws.com/NASA/5.+Battery+Data+Set.zip</a>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 2.</span>Парсинг</h3>
+        <p class="desc">Извлечение разрядных (discharge) циклов из .mat в единую таблицу; агрегация статистик по циклу.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">data/raw/*.mat</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/processed/raw_cycles.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/parser.py</code>
+          <code class="io-item">src/config.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 3.</span>Чистка</h3>
+        <p class="desc">Отбраковка физически невозможных измерений, удаление выбросов импеданса по MAD, отметка низкой ёмкости.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">data/processed/raw_cycles.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/processed/clean_cycles.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/clean.py</code>
+          <code class="io-item">src/config.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 4.</span>Построение признаков</h3>
+        <p class="desc">Лаговые признаки (shift +k), разности, нормировки (capacity_ratio, RUL_frac), скользящие характеристики.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">data/processed/clean_cycles.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/processed/battery_features.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/features.py</code>
+          <code class="io-item">src/config.py</code>
+        </p>
+        <p class="io">
+          <strong>Формулы:</strong>
+          <code class="io-item">voltage_mean</code>
+          <code class="io-item">capacity_ratio</code>
+          <code class="io-item">voltage_diff</code>
+          <code class="io-item">capacity_slope</code>
+          <code class="io-item">discharge_rate</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>2 дня</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 5.</span>Постановка задач</h3>
+        <p class="desc">Три задачи регрессии: RUL_frac (8 батарей), напряжение следующего цикла (34), ёмкость следующего цикла (33).</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">data/processed/battery_features.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/processed/battery_rul.parquet</span>
+          <span class="io-item">data/processed/battery_voltage.parquet</span>
+          <span class="io-item">data/processed/battery_capacity.parquet</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/rul.py</code>
+          <code class="io-item">src/config.py</code>
+        </p>
+        <p class="io">
+          <strong>Формулы:</strong>
+          <code class="io-item">rul_frac</code>
+          <code class="io-item">voltage_mean_next</code>
+          <code class="io-item">capacity_next</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 6.</span>Разделение данных</h3>
+        <p class="desc">GroupShuffleSplit по батареям (test_size=0.25, random_state=42): батарея целиком в одной части, складок нет.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">parquet-датасеты задач</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">train/val/test 4-2-2 батареи (RUL), 18-7-9 (voltage), 18-6-9 (capacity)</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/split.py</code>
+          <code class="io-item">src/config.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 7.</span>Обучение MLP</h3>
+        <p class="desc">Обучение трёх MLP Dense(64)-&gt;Dropout(0.2)-&gt;Dense(32)-&gt;Dense(1): MSE+MAE, Adam(1e-3), batch=32, early stopping.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">train/val датасеты</span>
+          <span class="io-item">imputer/scaler (fit на train)</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">model_rul.keras</span>
+          <span class="io-item">model_voltage.keras</span>
+          <span class="io-item">model_capacity.keras</span>
+          <span class="io-item">metrics_*.json</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/model.py</code>
+          <code class="io-item">src/main.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>2 дня</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 8.</span>Оценка и проверка утечек</h3>
+        <p class="desc">Расчёт MAE/RMSE/R² на test, per-battery MAE; проверка отсутствия утечек (scripts/check_leakage.py).</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">metrics_*.json</span>
+          <span class="io-item">сплиты</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">summary_metrics.json</span>
+          <span class="io-item">отчёт scripts/check_leakage.py → PASSED</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">scripts/check_leakage.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 10.</span>Сравнение с базовыми предсказателями</h3>
+        <p class="desc">Константа (среднее train), линейная регрессия и Random Forest на том же сплите по батареям: нижняя граница качества MLP. График сравнения строится из уже посчитанных метрик.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">parquet-датасеты задач</span>
+          <span class="io-item">сплиты батарей из metrics_*.json</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">metrics_baselines_{rul,voltage,capacity}.json</span>
+          <span class="io-item">summary_baselines.json</span>
+          <span class="io-item">comparison_baselines.json</span>
+          <span class="io-item">reports/figures/baseline_comparison.png</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/baselines.py</code>
+          <code class="io-item">scripts/run_baselines.py</code>
+          <code class="io-item">scripts/run_baseline_chart.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+      <div class="stage">
+        <h3><span class="stage-num">Этап 11.</span>Отчёт и документация</h3>
+        <p class="desc">Построение отчёта (md+html) из src/export.py, разбор работы (ликбез), XML-схема процесса.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">все JSON/PNG/keras-файлы</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">reports/lab1_report.md</span>
+          <span class="io-item">reports/lab1_report.html</span>
+          <span class="io-item">docs/lab1_likbez.md</span>
+          <span class="io-item">docs/lab1_likbez.html</span>
+          <span class="io-item">docs/lab1_defense.md</span>
+          <span class="io-item">docs/lab1_defense.html</span>
+          <span class="io-item">docs/project_structure.md</span>
+          <span class="io-item">docs/project_structure.docx</span>
+          <span class="io-item">docs/project_structure.pdf</span>
+          <span class="io-item">docs/lab1_process.xml</span>
+          <span class="io-item">docs/lab1_process.html</span>
+        </p>
+        <p class="io">
+          <strong>Файлы:</strong>
+          <code class="io-item">src/export.py</code>
+          <code class="io-item">src/html_report.py</code>
+          <code class="io-item">scripts/build_doc_html.py</code>
+          <code class="io-item">scripts/build_structure_doc.py</code>
+          <code class="io-item">scripts/xml_to_html.py</code>
+        </p>
+        <p class="dur"><strong>Длительность:</strong>1 день</p>
+      </div>
+    </section>
+    <section id="s3">
+      <h2>3. Сущности</h2>
+      <h3>3.1 Батареи (RUL-поднабор, 8 шт.)</h3>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Ambient, °C</th>
+          <th>Циклов</th>
+          <th>Категория</th>
+        </tr>
+        <tr>
+          <td>B0005</td>
+          <td>24</td>
+          <td>167</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0006</td>
+          <td>24</td>
+          <td>167</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0018</td>
+          <td>24</td>
+          <td>131</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0045</td>
+          <td>4</td>
+          <td>71</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0046</td>
+          <td>4</td>
+          <td>71</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0047</td>
+          <td>4</td>
+          <td>71</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0048</td>
+          <td>4</td>
+          <td>71</td>
+          <td>full_degradation</td>
+        </tr>
+        <tr>
+          <td>B0053</td>
+          <td>4</td>
+          <td>55</td>
+          <td>full_degradation</td>
+        </tr>
+      </table>
+      <h3>3.2 Признаки</h3>
+      <table>
+        <tr>
+          <th>Признак</th>
+          <th>Формула</th>
+          <th>Ед.</th>
+          <th>Источник</th>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_mean</code>
+          </td>
+          <td>mean(Voltage_measured)</td>
+          <td>V</td>
+          <td>Voltage_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_min</code>
+          </td>
+          <td>min(Voltage_measured)</td>
+          <td>V</td>
+          <td>Voltage_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_max</code>
+          </td>
+          <td>max(Voltage_measured)</td>
+          <td>V</td>
+          <td>Voltage_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_std</code>
+          </td>
+          <td>std(Voltage_measured)</td>
+          <td>V</td>
+          <td>Voltage_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>current_mean</code>
+          </td>
+          <td>mean(Current_measured)</td>
+          <td>А</td>
+          <td>Current_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>temp_mean</code>
+          </td>
+          <td>mean(Temperature_measured)</td>
+          <td>°C</td>
+          <td>Temperature_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>temp_min</code>
+          </td>
+          <td>min(Temperature_measured)</td>
+          <td>°C</td>
+          <td>Temperature_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>temp_max</code>
+          </td>
+          <td>max(Temperature_measured)</td>
+          <td>°C</td>
+          <td>Temperature_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>temp_range</code>
+          </td>
+          <td>temp_max - temp_min</td>
+          <td>°C</td>
+          <td>Temperature_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>time_total</code>
+          </td>
+          <td>длительность разряда</td>
+          <td>с</td>
+          <td>Time</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_range</code>
+          </td>
+          <td>voltage_max - voltage_min</td>
+          <td>V</td>
+          <td>Voltage_measured</td>
+        </tr>
+        <tr>
+          <td>
+            <code>discharge_rate</code>
+          </td>
+          <td>capacity / duration_discharge</td>
+          <td>Ahr/c</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity</code>
+          </td>
+          <td>ёмкость разрядного цикла</td>
+          <td>Ahr</td>
+          <td>Capacity</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_ratio</code>
+          </td>
+          <td>capacity / cap0</td>
+          <td>доли</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_mean_lag1</code>
+          </td>
+          <td>voltage_mean.shift(+1)</td>
+          <td>V</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_mean_lag2</code>
+          </td>
+          <td>voltage_mean.shift(+2)</td>
+          <td>V</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_lag1</code>
+          </td>
+          <td>capacity.shift(+1)</td>
+          <td>Ahr</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_lag2</code>
+          </td>
+          <td>capacity.shift(+2)</td>
+          <td>Ahr</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_lag3</code>
+          </td>
+          <td>capacity.shift(+3)</td>
+          <td>Ahr</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_diff</code>
+          </td>
+          <td>voltage_mean - voltage_mean_lag1</td>
+          <td>V</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_diff</code>
+          </td>
+          <td>capacity - capacity_lag1</td>
+          <td>Ahr</td>
+          <td>производное</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_slope</code>
+          </td>
+          <td>capacity_diff_lag1</td>
+          <td>Ahr</td>
+          <td>производное</td>
+        </tr>
+      </table>
+      <h3>3.3 Цели</h3>
+      <table>
+        <tr>
+          <th>Цель</th>
+          <th>Ед.</th>
+          <th>Формула</th>
+        </tr>
+        <tr>
+          <td>
+            <code>rul_frac</code>
+          </td>
+          <td>доли (0–1)</td>
+          <td>rul_cycles / total_cycles</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_mean_next</code>
+          </td>
+          <td>В</td>
+          <td>voltage_mean.shift(-1) следующего цикла</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_next</code>
+          </td>
+          <td>Ahr</td>
+          <td>capacity.shift(-1) следующего цикла</td>
+        </tr>
+      </table>
+      <h3>3.4 Модели (MLP)</h3>
+      <table>
+        <tr>
+          <th>Модель</th>
+          <th>Архитектура</th>
+          <th>Параметры</th>
+          <th>Loss</th>
+          <th>Метрика</th>
+        </tr>
+        <tr>
+          <td>
+            <code>model_rul</code>
+          </td>
+          <td>Dense(64) → Dropout(0.2) → Dense(32) → Dense(1)</td>
+          <td>3073</td>
+          <td>MSE</td>
+          <td>MAE</td>
+        </tr>
+        <tr>
+          <td>
+            <code>model_voltage</code>
+          </td>
+          <td>Dense(64) → Dropout(0.2) → Dense(32) → Dense(1)</td>
+          <td>3009</td>
+          <td>MSE</td>
+          <td>MAE</td>
+        </tr>
+        <tr>
+          <td>
+            <code>model_capacity</code>
+          </td>
+          <td>Dense(64) → Dropout(0.2) → Dense(32) → Dense(1)</td>
+          <td>2817</td>
+          <td>MSE</td>
+          <td>MAE</td>
+        </tr>
+      </table>
+    </section>
+    <section id="s4">
+      <h2>4. Файлы</h2>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Путь</th>
+          <th>Тип</th>
+          <th>Размер (строк × колонок)</th>
+          <th>Содержимое</th>
+          <th>Создатель</th>
+          <th>Используется</th>
+        </tr>
+        <tr>
+          <td>
+            <code>raw_cycles</code>
+          </td>
+          <td>
+            <code>data/processed/raw_cycles.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>2769 × 23</td>
+          <td>discharge-циклы 34 батарей, статистики</td>
+          <td>
+            <code>src/parser.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/clean.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>clean_cycles</code>
+          </td>
+          <td>
+            <code>data/processed/clean_cycles.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>2764 × 24</td>
+          <td>очищенная таблица, is_low_capacity</td>
+          <td>
+            <code>src/clean.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/features.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>battery_features</code>
+          </td>
+          <td>
+            <code>data/processed/battery_features.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>2764 × 39</td>
+          <td>признаки + лаги + цели next-цикла</td>
+          <td>
+            <code>src/features.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/rul.py</code>
+            <code class="io-item">src/model.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>battery_rul</code>
+          </td>
+          <td>
+            <code>data/processed/battery_rul.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>812 × 21</td>
+          <td>датасет RUL_frac (8 батарей)</td>
+          <td>
+            <code>src/rul.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/model.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>battery_voltage</code>
+          </td>
+          <td>
+            <code>data/processed/battery_voltage.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>2662 × 18</td>
+          <td>датасет voltage_mean_next</td>
+          <td>
+            <code>src/rul.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/model.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>battery_capacity</code>
+          </td>
+          <td>
+            <code>data/processed/battery_capacity.parquet</code>
+          </td>
+          <td>parquet</td>
+          <td>2628 × 15</td>
+          <td>датасет capacity_next</td>
+          <td>
+            <code>src/rul.py</code>
+          </td>
+          <td>
+            <code class="io-item">src/model.py</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_rul</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_rul.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>MAE/RMSE/R²/per-battery/эпохи (MLP, 14 признаков)</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_voltage</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_voltage.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>MAE/RMSE/R²/per-battery/эпохи (MLP, 13 признаков)</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_capacity</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_capacity.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>MAE/RMSE/R²/per-battery/эпохи (MLP, 10 признаков)</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>summary_metrics</code>
+          </td>
+          <td>
+            <code>data/processed/summary_metrics.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>сводные метрики трёх задач</td>
+          <td>
+            <code>src/export.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>comparison_baselines</code>
+          </td>
+          <td>
+            <code>data/processed/comparison_baselines.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>MLP vs baseline (constant/linear/rf) по трём задачам</td>
+          <td>
+            <code>scripts/run_baselines.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>summary_baselines</code>
+          </td>
+          <td>
+            <code>data/processed/summary_baselines.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>сводка baseline метрик по трём задачам</td>
+          <td>
+            <code>scripts/run_baselines.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_baselines_rul</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_baselines_rul.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>baseline (constant/linear/rf) задача A: RUL_frac</td>
+          <td>
+            <code>scripts/run_baselines.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_baselines_voltage</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_baselines_voltage.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>baseline (constant/linear/rf) задача B: voltage</td>
+          <td>
+            <code>scripts/run_baselines.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>metrics_baselines_capacity</code>
+          </td>
+          <td>
+            <code>data/processed/metrics_baselines_capacity.json</code>
+          </td>
+          <td>json</td>
+          <td>—</td>
+          <td>baseline (constant/linear/rf) задача C: capacity</td>
+          <td>
+            <code>scripts/run_baselines.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>model_rul_keras</code>
+          </td>
+          <td>
+            <code>data/processed/model_rul.keras</code>
+          </td>
+          <td>keras</td>
+          <td>—</td>
+          <td>MLP RUL_frac</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>model_voltage_keras</code>
+          </td>
+          <td>
+            <code>data/processed/model_voltage.keras</code>
+          </td>
+          <td>keras</td>
+          <td>—</td>
+          <td>MLP voltage</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>model_capacity_keras</code>
+          </td>
+          <td>
+            <code>data/processed/model_capacity.keras</code>
+          </td>
+          <td>keras</td>
+          <td>—</td>
+          <td>MLP capacity</td>
+          <td>
+            <code>src/model.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>report_md</code>
+          </td>
+          <td>
+            <code>reports/lab1_report.md</code>
+          </td>
+          <td>markdown</td>
+          <td>—</td>
+          <td>отчёт (markdown-исходник)</td>
+          <td>
+            <code>src/export.py</code>
+          </td>
+          <td>
+            <code class="io-item">reports/lab1_report.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>report_html</code>
+          </td>
+          <td>
+            <code>reports/lab1_report.html</code>
+          </td>
+          <td>html</td>
+          <td>—</td>
+          <td>отчёт (HTML, pandoc)</td>
+          <td>
+            <code>src/html_report.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>likbez_md</code>
+          </td>
+          <td>
+            <code>docs/lab1_likbez.md</code>
+          </td>
+          <td>markdown</td>
+          <td>—</td>
+          <td>ликбез: подробный разбор работы</td>
+          <td>
+            <code/>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>likbez_html</code>
+          </td>
+          <td>
+            <code>docs/lab1_likbez.html</code>
+          </td>
+          <td>html</td>
+          <td>—</td>
+          <td>ликбез HTML</td>
+          <td>
+            <code>scripts/build_doc_html.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>defense_md</code>
+          </td>
+          <td>
+            <code>docs/lab1_defense.md</code>
+          </td>
+          <td>markdown</td>
+          <td>—</td>
+          <td>короткая версия для устной защиты: рассказ, числа, словарик</td>
+          <td>
+            <code/>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>defense_html</code>
+          </td>
+          <td>
+            <code>docs/lab1_defense.html</code>
+          </td>
+          <td>html</td>
+          <td>—</td>
+          <td>короткая версия для защиты, HTML</td>
+          <td>
+            <code>scripts/build_doc_html.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>structure_md</code>
+          </td>
+          <td>
+            <code>docs/project_structure.md</code>
+          </td>
+          <td>markdown</td>
+          <td>—</td>
+          <td>структура проекта по папкам: что где лежит, команды, что можно удалить</td>
+          <td>
+            <code>scripts/build_structure_doc.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>structure_docx</code>
+          </td>
+          <td>
+            <code>docs/project_structure.docx</code>
+          </td>
+          <td>docx</td>
+          <td>—</td>
+          <td>тот же документ в формате Word</td>
+          <td>
+            <code>scripts/build_structure_doc.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>structure_pdf</code>
+          </td>
+          <td>
+            <code>docs/project_structure.pdf</code>
+          </td>
+          <td>pdf</td>
+          <td>—</td>
+          <td>тот же документ в формате PDF (печать HTML в headless-браузере)</td>
+          <td>
+            <code>scripts/build_structure_doc.py</code>
+          </td>
+          <td/>
+        </tr>
+        <tr>
+          <td>
+            <code>xsd</code>
+          </td>
+          <td>
+            <code>docs/lab1_process.xsd</code>
+          </td>
+          <td>xsd</td>
+          <td>—</td>
+          <td>XSD-схема процесса</td>
+          <td>
+            <code/>
+          </td>
+          <td>
+            <code class="io-item">lab1_process.xml</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>xsl</code>
+          </td>
+          <td>
+            <code>docs/lab1_process.xsl</code>
+          </td>
+          <td>xsl</td>
+          <td>—</td>
+          <td>XSLT-преобразование в HTML</td>
+          <td>
+            <code/>
+          </td>
+          <td>
+            <code class="io-item">lab1_process.html</code>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>xml</code>
+          </td>
+          <td>
+            <code>docs/lab1_process.xml</code>
+          </td>
+          <td>xml</td>
+          <td>—</td>
+          <td>данная XML-схема процесса</td>
+          <td>
+            <code/>
+          </td>
+          <td>
+            <code class="io-item">scripts/xml_to_html.py</code>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section id="s5">
+      <h2>5. Формулы</h2>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>LaTeX</th>
+          <th>Plain</th>
+          <th>Используется</th>
+        </tr>
+        <tr>
+          <td>
+            <code>mse</code>
+          </td>
+          <td>MSE</td>
+          <td>
+            <code class="formula">\(MSE = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2\)</code>
+          </td>
+          <td>
+            <code class="formula">MSE = (1/n) · Σ(yᵢ − ŷᵢ)²</code>
+          </td>
+          <td>loss</td>
+        </tr>
+        <tr>
+          <td>
+            <code>mae</code>
+          </td>
+          <td>MAE</td>
+          <td>
+            <code class="formula">\(MAE = \frac{1}{n} \sum_{i=1}^{n} |y_i - \hat{y}_i|\)</code>
+          </td>
+          <td>
+            <code class="formula">MAE = (1/n) · Σ|yᵢ − ŷᵢ|</code>
+          </td>
+          <td>metric</td>
+        </tr>
+        <tr>
+          <td>
+            <code>rmse</code>
+          </td>
+          <td>RMSE</td>
+          <td>
+            <code class="formula">\(RMSE = \sqrt{\frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2}\)</code>
+          </td>
+          <td>
+            <code class="formula">RMSE = sqrt(MSE)</code>
+          </td>
+          <td>metric</td>
+        </tr>
+        <tr>
+          <td>
+            <code>r2</code>
+          </td>
+          <td>R²</td>
+          <td>
+            <code class="formula">\(R^2 = 1 - \frac{\sum_{i=1}^{n} (y_i - \hat{y}_i)^2}{\sum_{i=1}^{n} (y_i - \bar{y})^2}\)</code>
+          </td>
+          <td>
+            <code class="formula">R² = 1 − SS_res / SS_tot</code>
+          </td>
+          <td>metric</td>
+        </tr>
+        <tr>
+          <td>
+            <code>rul_frac</code>
+          </td>
+          <td>RUL_frac</td>
+          <td>
+            <code class="formula">\(RUL\_frac = \frac{RUL\_cycles}{total\_cycles}\)</code>
+          </td>
+          <td>
+            <code class="formula">RUL_frac = RUL_cycles / total_cycles</code>
+          </td>
+          <td>target</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_ratio</code>
+          </td>
+          <td>capacity_ratio</td>
+          <td>
+            <code class="formula">\(capacity\_ratio = \frac{capacity}{cap0}\)</code>
+          </td>
+          <td>
+            <code class="formula">capacity_ratio = capacity / cap0</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_mean</code>
+          </td>
+          <td>voltage_mean</td>
+          <td>
+            <code class="formula">\(\mathrm{voltage\_mean} = \frac{1}{N}\sum_{j=1}^{N} Voltage\_measured_j\)</code>
+          </td>
+          <td>
+            <code class="formula">voltage_mean = mean(Voltage_measured)</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>voltage_diff</code>
+          </td>
+          <td>voltage_diff</td>
+          <td>
+            <code class="formula">\(\mathrm{voltage\_diff} = voltage\_mean - voltage\_mean\_lag1\)</code>
+          </td>
+          <td>
+            <code class="formula">voltage_diff = voltage_mean − voltage_mean_lag1</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_diff</code>
+          </td>
+          <td>capacity_diff</td>
+          <td>
+            <code class="formula">\(\mathrm{capacity\_diff} = capacity - capacity\_lag1\)</code>
+          </td>
+          <td>
+            <code class="formula">capacity_diff = capacity − capacity_lag1</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>capacity_slope</code>
+          </td>
+          <td>capacity_slope</td>
+          <td>
+            <code class="formula">\(\mathrm{capacity\_slope} = capacity\_diff\_lag1\)</code>
+          </td>
+          <td>
+            <code class="formula">capacity_slope = capacity_diff предыдущего шага</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>discharge_rate</code>
+          </td>
+          <td>discharge_rate</td>
+          <td>
+            <code class="formula">\(\mathrm{discharge\_rate} = \frac{capacity}{duration\_discharge}\)</code>
+          </td>
+          <td>
+            <code class="formula">discharge_rate = capacity / duration_discharge</code>
+          </td>
+          <td>feature</td>
+        </tr>
+        <tr>
+          <td>
+            <code>mae_cycles</code>
+          </td>
+          <td>MAE_cycles</td>
+          <td>
+            <code class="formula">\(MAE\_cycles = MAE\_frac \times \overline{total\_cycles}_{test}\)</code>
+          </td>
+          <td>
+            <code class="formula">MAE_cycles = MAE_frac × среднее total_cycles теста</code>
+          </td>
+          <td>metric</td>
+        </tr>
+        <tr>
+          <td>
+            <code>standard_scaler</code>
+          </td>
+          <td>StandardScaler</td>
+          <td>
+            <code class="formula">\(z = \frac{x - \mu_{train}}{\sigma_{train}}\)</code>
+          </td>
+          <td>
+            <code class="formula">z = (x − mean_train) / std_train</code>
+          </td>
+          <td>preprocessing</td>
+        </tr>
+      </table>
+    </section>
+    <section id="s6">
+      <h2>6. Процессы</h2>
+      <div class="stage">
+        <h3><code>parsing</code> — Парсинг .mat</h3>
+        <p class="desc">Чтение .mat через scipy.io.loadmat(simplify_cells=True), извлечение зарядных/разрядных циклов, агрегация статистик по discharge-циклу.</p>
+        <p class="io">
+          <strong>Входы:</strong>
+          <span class="io-item">data/raw/*.mat</span>
+        </p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">data/processed/raw_cycles.parquet</span>
+        </p>
+        <ol class="steps">
+          <li>1. Открыть .mat, найти поле cycle</li>
+          <li>2. Для каждого цикла извлечь type (charge/discharge/impedance)</li>
+          <li>3. Для discharge посчитать статистики (mean/min/max/std) по Voltage, Current, Temperature</li>
+          <li>4. Собрать единую таблицу: идентификатор батареи, номер цикла, дата, статистики цикла</li>
+          <li>5. Сохранить raw_cycles.parquet</li>
+        </ol>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/parser.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>cleaning</code> — Чистка</h3>
+        <p class="desc">Удаление физически невозможных значений и выбросов; отметка низкой ёмкости (EOL).</p>
+        <ul class="rules">
+          <li>capacity ∉ [0, 2.6] → NaN</li>
+          <li>voltage &lt; 0 → NaN</li>
+          <li>re, rct ∉ [0, 1] → NaN (MAD-правило k=5)</li>
+          <li>первые 3 цикла (формирование) — SKIP_FORMATION</li>
+          <li>cap &lt; 0.5·cap0 → is_low_capacity=True (EOL)</li>
+        </ul>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/clean.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>feature_engineering</code> — Построение признаков</h3>
+        <p class="desc">Производные признаки: лаги (shift +k), разности, нормировки, скорость разряда.</p>
+        <p class="io">
+          <strong>Признаки:</strong>
+          <code class="io-item">voltage_mean_lag1/lag2</code>
+          <code class="io-item">capacity_lag1/lag2/lag3</code>
+          <code class="io-item">voltage_diff</code>
+          <code class="io-item">capacity_diff</code>
+          <code class="io-item">capacity_slope</code>
+          <code class="io-item">discharge_rate</code>
+          <code class="io-item">capacity_ratio (нормировка на cap0)</code>
+        </p>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/features.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>tasks</code> — Постановка задач</h3>
+        <p class="desc">Три регрессионные задачи на основе battery_features.parquet.</p>
+        <p class="io">
+          <strong>Выходы:</strong>
+          <span class="io-item">battery_rul.parquet — цель rul_frac (8 батарей)</span>
+          <span class="io-item">battery_voltage.parquet — цель voltage_mean_next (34 батареи)</span>
+          <span class="io-item">battery_capacity.parquet — цель capacity_next (33 батареи)</span>
+        </p>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/rul.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>split</code> — Разделение данных</h3>
+        <p class="desc">GroupShuffleSplit по battery_id: батарея принадлежит ровно одной части. Preprocessing (imputer, scaler) обучается только на train.</p>
+        <table class="hp">
+          <tr>
+            <th>Гиперпараметр</th>
+            <th>Значение</th>
+          </tr>
+          <tr>
+            <td>
+              <code>test_size</code>
+            </td>
+            <td>0.25</td>
+          </tr>
+          <tr>
+            <td>
+              <code>random_state</code>
+            </td>
+            <td>42</td>
+          </tr>
+          <tr>
+            <td>
+              <code>group</code>
+            </td>
+            <td>battery_id</td>
+          </tr>
+        </table>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/split.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>training</code> — Обучение MLP</h3>
+        <p class="desc">Три независимых MLP для трёх задач; ранняя остановка по val MAE с восстановлением лучших весов.</p>
+        <table class="hp">
+          <tr>
+            <th>Гиперпараметр</th>
+            <th>Значение</th>
+          </tr>
+          <tr>
+            <td>
+              <code>architecture</code>
+            </td>
+            <td>Dense(64) → Dropout(0.2) → Dense(32) → Dense(1)</td>
+          </tr>
+          <tr>
+            <td>
+              <code>loss</code>
+            </td>
+            <td>MSE</td>
+          </tr>
+          <tr>
+            <td>
+              <code>metric</code>
+            </td>
+            <td>MAE</td>
+          </tr>
+          <tr>
+            <td>
+              <code>optimizer</code>
+            </td>
+            <td>Adam(1e-3)</td>
+          </tr>
+          <tr>
+            <td>
+              <code>batch_size</code>
+            </td>
+            <td>32</td>
+          </tr>
+          <tr>
+            <td>
+              <code>epochs</code>
+            </td>
+            <td>≤ 200</td>
+          </tr>
+          <tr>
+            <td>
+              <code>early_stopping</code>
+            </td>
+            <td>patience=10</td>
+          </tr>
+          <tr>
+            <td>
+              <code>seed</code>
+            </td>
+            <td>42</td>
+          </tr>
+        </table>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/model.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>evaluation</code> — Оценка</h3>
+        <p class="desc">MAE/RMSE/R² на test, per-battery MAE, MAE_cycles для RUL.</p>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/export.py</code>
+        </p>
+      </div>
+      <div class="stage">
+        <h3><code>baselines</code> — Сравнение с базовыми предсказателями</h3>
+        <p class="desc">Константа (среднее train), LinearRegression (imputer+scaler fit на train), RandomForest(100, rs=42); оценка MAE/RMSE/R² на тесте, сравнение с MLP.</p>
+        <p class="io">
+          <strong>Исходники:</strong>
+          <code class="io-item">src/baselines.py</code>
+          <code class="io-item">scripts/run_baselines.py</code>
+          <code class="io-item">scripts/run_baseline_chart.py</code>
+        </p>
+      </div>
+    </section>
+    <section id="s7">
+      <h2>7. Проверки</h2>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Описание</th>
+          <th>Скрипт</th>
+          <th>Метрика</th>
+          <th>Статус</th>
+        </tr>
+        <tr>
+          <td>
+            <code>leakage_features</code>
+          </td>
+          <td>Колонки для построения цели не подаются в сеть</td>
+          <td>в feature_cols нет колонок, нужных только для построения цели и разбиения: номер цикла, длина серии, дата, идентификатор батареи, время цикла</td>
+          <td>
+            <code>scripts/check_leakage.py</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>leakage_lags</code>
+          </td>
+          <td>Лаги</td>
+          <td>лаги используют shift(+k) (прошлое), не shift(−1) (будущее)</td>
+          <td>
+            <code>scripts/check_leakage.py</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>leakage_scaler</code>
+          </td>
+          <td>StandardScaler</td>
+          <td>scaler/imputer fit только на train</td>
+          <td>
+            <code>scripts/check_leakage.py</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>leakage_split</code>
+          </td>
+          <td>Split</td>
+          <td>GroupShuffleSplit по батареям, пересечений батарей между train/val/test нет</td>
+          <td>
+            <code>scripts/check_leakage.py</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>reproducibility</code>
+          </td>
+          <td>Воспроизводимость</td>
+          <td>метрики совпадают с сохранёнными до 6-го знака (R² 0.802316)</td>
+          <td>
+            <code>скрипт повторного обучения</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <code>pytest</code>
+          </td>
+          <td>Пайплайн-тесты</td>
+          <td>24 теста проходят (tests/)</td>
+          <td>
+            <code>py -X utf8 -m pytest tests -q</code>
+          </td>
+          <td/>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+      </table>
+    </section>
+    <section id="s8">
+      <h2>8. Результаты</h2>
+      <h3>Задача <code>RUL_frac</code> — цель rul_frac</h3>
+      <table class="res">
+        <tr>
+          <th>Сплит</th>
+          <th>MAE</th>
+          <th>RMSE</th>
+          <th>R2</th>
+          <th>MAE_cycles</th>
+        </tr>
+        <tr>
+          <td>Батарей / train / val / test:
+                  8 /
+                  272 /
+                  300 /
+                  240</td>
+          <td>0.108867</td>
+          <td>0.129426</td>
+          <td>0.802316</td>
+          <td>12.955</td>
+        </tr>
+      </table>
+      <p class="io">
+        <strong>Per-battery MAE (test):</strong>
+        <span class="io-item">B0006: 0.094</span>
+        <span class="io-item">B0047: 0.143</span>
+      </p>
+      <h3>Задача <code>voltage</code> — цель voltage_mean_next</h3>
+      <table class="res">
+        <tr>
+          <th>Сплит</th>
+          <th>MAE</th>
+          <th>RMSE</th>
+          <th>R2</th>
+        </tr>
+        <tr>
+          <td>Батарей / train / val / test:
+                  34 /
+                  1280 /
+                  686 /
+                  696</td>
+          <td>0.156747</td>
+          <td>0.259169</td>
+          <td>0.048058</td>
+        </tr>
+      </table>
+      <p class="io">
+        <strong>Per-battery MAE (test):</strong>
+        <span class="io-item">B0050: 1.104</span>
+        <span class="io-item">B0042: 0.181</span>
+      </p>
+      <h3>Задача <code>capacity</code> — цель capacity_next</h3>
+      <table class="res">
+        <tr>
+          <th>Сплит</th>
+          <th>MAE</th>
+          <th>RMSE</th>
+          <th>R2</th>
+        </tr>
+        <tr>
+          <td>Батарей / train / val / test:
+                  33 /
+                  1377 /
+                  565 /
+                  686</td>
+          <td>0.138128</td>
+          <td>0.267759</td>
+          <td>0.757734</td>
+        </tr>
+      </table>
+      <p class="io">
+        <strong>Per-battery MAE (test):</strong>
+        <span class="io-item">B0042: 0.305</span>
+        <span class="io-item">B0049: 0.160</span>
+      </p>
+    </section>
+    <section id="s9">
+      <h2>9. Базовые предсказатели (baseline)</h2>
+      <p class="desc">Один и тот же сплит по батареям и один и тот же препроцессинг для всех
+            четырёх методов. У константы R² = 0 по построению; отрицательное R² — хуже константы.</p>
+      <div class="stage version">
+        <h3>MLP (Dense(64) → Dropout(0.2) → Dense(32) → Dense(1))</h3>
+        <p class="desc">Основная модель: 14 / 13 / 10 признаков, MSE, Adam(1e-3), batch 32, early stopping, сплит по батареям.</p>
+        <table>
+          <tr>
+            <th>Задача</th>
+            <th>R²</th>
+            <th>MAE</th>
+            <th>RMSE</th>
+          </tr>
+          <tr>
+            <td>RUL_frac</td>
+            <td>0.8023</td>
+            <td>0.1089</td>
+            <td>0.1294</td>
+          </tr>
+          <tr>
+            <td>voltage</td>
+            <td>0.0481</td>
+            <td>0.1567</td>
+            <td>0.2592</td>
+          </tr>
+          <tr>
+            <td>capacity</td>
+            <td>0.7577</td>
+            <td>0.1381</td>
+            <td>0.2678</td>
+          </tr>
+        </table>
+        <p class="note">3073 / 3009 / 2817 параметров; лучший результат только на RUL_frac.</p>
+      </div>
+      <div class="stage version">
+        <h3>Константа (среднее train)</h3>
+        <p class="desc">Предсказание среднего значения цели по train-строкам, выданное на все строки теста.</p>
+        <table>
+          <tr>
+            <th>Задача</th>
+            <th>R²</th>
+            <th>MAE</th>
+            <th>RMSE</th>
+          </tr>
+          <tr>
+            <td>RUL_frac</td>
+            <td>0.0000</td>
+            <td>0.2521</td>
+            <td>0.2911</td>
+          </tr>
+          <tr>
+            <td>voltage</td>
+            <td>-0.0478</td>
+            <td>0.1627</td>
+            <td>0.2719</td>
+          </tr>
+          <tr>
+            <td>capacity</td>
+            <td>-0.0067</td>
+            <td>0.4182</td>
+            <td>0.5458</td>
+          </tr>
+        </table>
+        <p class="note">Нижняя граница: R² = 0 по построению, отрицательное значение означает «хуже, чем одно число всем».</p>
+      </div>
+      <div class="stage version">
+        <h3>Линейная регрессия</h3>
+        <p class="desc">LinearRegression на тех же признаках после SimpleImputer(median) + StandardScaler, обученных только на train.</p>
+        <table>
+          <tr>
+            <th>Задача</th>
+            <th>R²</th>
+            <th>MAE</th>
+            <th>RMSE</th>
+          </tr>
+          <tr>
+            <td>RUL_frac</td>
+            <td>-2127.8636</td>
+            <td>11.2610</td>
+            <td>13.4310</td>
+          </tr>
+          <tr>
+            <td>voltage</td>
+            <td>0.8684</td>
+            <td>0.0388</td>
+            <td>0.0964</td>
+          </tr>
+          <tr>
+            <td>capacity</td>
+            <td>0.8424</td>
+            <td>0.0975</td>
+            <td>0.2159</td>
+          </tr>
+        </table>
+        <p class="note">15 / 14 / 11 параметров. На RUL_frac ломается об экстраполяцию: тестовая батарея B0006 (167 циклов) длиннее любой обучающей серии (максимум 71 цикл).</p>
+      </div>
+      <div class="stage version">
+        <h3>Random Forest</h3>
+        <p class="desc">RandomForestRegressor, 100 деревьев, random_state = 42, median-imputer на train (scaler не нужен).</p>
+        <table>
+          <tr>
+            <th>Задача</th>
+            <th>R²</th>
+            <th>MAE</th>
+            <th>RMSE</th>
+          </tr>
+          <tr>
+            <td>RUL_frac</td>
+            <td>-0.7499</td>
+            <td>0.2800</td>
+            <td>0.3851</td>
+          </tr>
+          <tr>
+            <td>voltage</td>
+            <td>0.5711</td>
+            <td>0.0742</td>
+            <td>0.1740</td>
+          </tr>
+          <tr>
+            <td>capacity</td>
+            <td>0.7025</td>
+            <td>0.1428</td>
+            <td>0.2967</td>
+          </tr>
+        </table>
+        <p class="note">На 8 батареях деревья переобучаются и уходят ниже константы; на 33–34 батареях занимают промежуточное положение.</p>
+      </div>
+    </section>
+    <section id="s10">
+      <h2>10. Ссылки</h2>
+      <ul class="refs">
+        <li>NASA PCoE Battery Dataset (исходные данные)
+                    — <a href="https://phm-datasets.s3.amazonaws.com/NASA/5.+Battery+Data+Set.zip" rel="noopener"><code>https://phm-datasets.s3.amazonaws.com/NASA/5.+Battery+Data+Set.zip</code></a></li>
+        <li>HTML-отчёт лабораторной №1
+                    — <a class="local" href="reports/lab1_report.html"><code>reports/lab1_report.html</code></a></li>
+        <li>Отчёт (markdown-исходник)
+                    — <a class="local" href="reports/lab1_report.md"><code>reports/lab1_report.md</code></a></li>
+        <li>Ликбез по лабораторной работе
+                    — <a class="local" href="docs/lab1_likbez.html"><code>docs/lab1_likbez.html</code></a></li>
+        <li>XSD-схема процесса
+                    — <a class="local" href="docs/lab1_process.xsd"><code>docs/lab1_process.xsd</code></a></li>
+        <li>XSLT-преобразование процесса в HTML
+                    — <a class="local" href="docs/lab1_process.xsl"><code>docs/lab1_process.xsl</code></a></li>
+        <li>Исходный код
+                    — <a class="local" href="src/"><code>src/</code></a></li>
+        <li>Графики отчёта
+                    — <a class="local" href="reports/figures/"><code>reports/figures/</code></a></li>
+        <li>Теоретическая памятка
+                    — <a class="local" href="reports/theory_manual.md"><code>reports/theory_manual.md</code></a></li>
+      </ul>
+    </section>
+    <section id="s11">
+      <h2>11. Приложение</h2>
+      <h3>11.1 Дерево файлов</h3>
+      <pre class="tree">D:\battery_project\ (корень проекта)
+├── data/
+│   ├── raw/                    → 34 файла B0005.mat … B0056.mat (вход)
+│   ├── interim/                → (пусто; сырые parquet складываются в processed)
+│   └── processed/              → parquet, json, keras-файлы
+│       ├── raw_cycles.parquet     2769×23
+│       ├── clean_cycles.parquet   2764×24
+│       ├── battery_features.parquet 2764×39
+│       ├── battery_rul.parquet    812×21
+│       ├── battery_voltage.parquet 2662×18
+│       ├── battery_capacity.parquet 2628×15
+│       ├── metrics_{rul,voltage,capacity}.json
+│       ├── metrics_baselines_{rul,voltage,capacity}.json
+│       ├── summary_metrics.json, summary_baselines.json, comparison_baselines.json
+│       └── model_{rul,voltage,capacity}.keras
+├── src/                       → parser.py, clean.py, features.py, rul.py, split.py, model.py,
+│                                 validate.py, baselines.py, plots.py, infographics.py,
+│                                 export.py, html_report.py, main.py, config.py
+├── scripts/                   → run_all.py, run_baselines.py, run_baseline_chart.py,
+│                                 regen_figures.py, build_html_report.py, build_doc_html.py,
+│                                 build_structure_doc.py, check_leakage.py, xml_to_html.py
+├── tests/                     → pytest: parser, features, rul, split (24 passed)
+├── reports/
+│   ├── lab1_report.md / lab1_report.html
+│   ├── style.css, theory_manual.md
+│   └── figures/               → 33 PNG, из них 18 подключены к отчёту
+└── docs/                      → lab1_likbez.md/.html, lab1_defense.md/.html,
+                                  project_structure.md/.docx/.pdf, style_likbez.css,
+                                  lab1_process.xml/.xsd/.xsl/.css/.html</pre>
+      <h3>11.2 Таблица метрик (сводная)</h3>
+      <table>
+        <tr class="thead">
+          <th>Задача</th>
+          <th>Метод</th>
+          <th>MAE</th>
+          <th>RMSE</th>
+          <th>R²</th>
+          <th>Эпох</th>
+        </tr>
+        <tr>
+          <td>RUL_frac (8 батарей)</td>
+          <td>MLP</td>
+          <td>0.108867</td>
+          <td>0.129426</td>
+          <td>0.802316</td>
+          <td>66</td>
+        </tr>
+        <tr>
+          <td>voltage (34 батареи)</td>
+          <td>MLP</td>
+          <td>0.156747</td>
+          <td>0.259169</td>
+          <td>0.048058</td>
+          <td>73</td>
+        </tr>
+        <tr>
+          <td>capacity (33 батареи)</td>
+          <td>MLP</td>
+          <td>0.138128</td>
+          <td>0.267759</td>
+          <td>0.757734</td>
+          <td>67</td>
+        </tr>
+        <tr>
+          <td>RUL_frac (8 батарей)</td>
+          <td>константа</td>
+          <td>0.252104</td>
+          <td>0.291095</td>
+          <td>0.000000</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>RUL_frac (8 батарей)</td>
+          <td>линейная регрессия</td>
+          <td>11.260989</td>
+          <td>13.430999</td>
+          <td>-2127.863554</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>RUL_frac (8 батарей)</td>
+          <td>Random Forest</td>
+          <td>0.279976</td>
+          <td>0.385075</td>
+          <td>-0.749934</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>voltage (34 батареи)</td>
+          <td>константа</td>
+          <td>0.162650</td>
+          <td>0.271906</td>
+          <td>-0.047814</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>voltage (34 батареи)</td>
+          <td>линейная регрессия</td>
+          <td>0.038803</td>
+          <td>0.096377</td>
+          <td>0.868358</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>voltage (34 батареи)</td>
+          <td>Random Forest</td>
+          <td>0.074159</td>
+          <td>0.173957</td>
+          <td>0.571125</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>capacity (33 батареи)</td>
+          <td>константа</td>
+          <td>0.418249</td>
+          <td>0.545823</td>
+          <td>-0.006716</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>capacity (33 батареи)</td>
+          <td>линейная регрессия</td>
+          <td>0.097518</td>
+          <td>0.215933</td>
+          <td>0.842441</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td>capacity (33 батареи)</td>
+          <td>Random Forest</td>
+          <td>0.142793</td>
+          <td>0.296715</td>
+          <td>0.702502</td>
+          <td>—</td>
+        </tr>
+      </table>
+      <h3>11.3 Графики</h3>
+      <table>
+        <tr>
+          <th>ID</th>
+          <th>Название</th>
+          <th>Файл</th>
+        </tr>
+        <tr>
+          <td>01</td>
+          <td>Сравнение метрик трёх задач</td>
+          <td>
+            <code>figures/01_comparison_metrics.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>02</td>
+          <td>Per-battery MAE</td>
+          <td>
+            <code>figures/02_per_battery_mae.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>03</td>
+          <td>Кривые обучения</td>
+          <td>
+            <code>figures/03_training_curves_all.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>04</td>
+          <td>Схема пайплайна</td>
+          <td>
+            <code>figures/04_pipeline_schema.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>05</td>
+          <td>Архитектура MLP</td>
+          <td>
+            <code>figures/05_model_architecture.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>06</td>
+          <td>Корреляционная матрица</td>
+          <td>
+            <code>figures/06_correlation_heatmap.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>07</td>
+          <td>Аномальные батареи</td>
+          <td>
+            <code>figures/07_anomalous_batteries.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>08</td>
+          <td>Feature importance (честная)</td>
+          <td>
+            <code>figures/08_feature_importance.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>09</td>
+          <td>RUL_cycles vs RUL_frac</td>
+          <td>
+            <code>figures/09_rul_vs_rul_frac.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>10</td>
+          <td>Итоговый дашборд</td>
+          <td>
+            <code>figures/10_summary_dashboard.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>C1</td>
+          <td>Деградация ёмкости</td>
+          <td>
+            <code>figures/capacity_degradation.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>C2</td>
+          <td>Прогнозы ёмкости</td>
+          <td>
+            <code>figures/capacity_predictions.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>C3</td>
+          <td>Остатки ёмкости</td>
+          <td>
+            <code>figures/capacity_residuals.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>R1</td>
+          <td>Прогнозы RUL_frac</td>
+          <td>
+            <code>figures/rul_frac_predictions.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>R2</td>
+          <td>Остатки RUL_frac</td>
+          <td>
+            <code>figures/rul_frac_residuals.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>R3</td>
+          <td>Распределение RUL_frac</td>
+          <td>
+            <code>figures/rul_frac_distribution.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>BL0</td>
+          <td>R² (test): MLP против baseline по трём задачам</td>
+          <td>
+            <code>figures/baseline_comparison.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>BL1</td>
+          <td>MAE: MLP против baseline по трём задачам</td>
+          <td>
+            <code>figures/baselines_comparison.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>BL2</td>
+          <td>R²: MLP против baseline по трём задачам</td>
+          <td>
+            <code>figures/baselines_r2.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>BL3</td>
+          <td>MAE (лог-шкала): MLP против baseline</td>
+          <td>
+            <code>figures/comparison_baselines.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>Vu1</td>
+          <td>Прогнозы напряжения</td>
+          <td>
+            <code>figures/voltage_predictions.png</code>
+          </td>
+        </tr>
+        <tr>
+          <td>Vu2</td>
+          <td>Остатки напряжения</td>
+          <td>
+            <code>figures/voltage_residuals.png</code>
+          </td>
+        </tr>
+      </table>
+      <h3>11.4 Тесты</h3>
+      <table>
+        <tr>
+          <th>Набор</th>
+          <th>Pytest</th>
+          <th>Результат</th>
+        </tr>
+        <tr>
+          <td>Парсинг .mat</td>
+          <td>
+            <code>tests/test_parser.py</code>
+          </td>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Построение признаков</td>
+          <td>
+            <code>tests/test_features.py</code>
+          </td>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Постановка задачи RUL</td>
+          <td>
+            <code>tests/test_rul.py</code>
+          </td>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Разделение данных</td>
+          <td>
+            <code>tests/test_split.py</code>
+          </td>
+          <td>
+            <span class="badge ok">PASSED</span>
+          </td>
+        </tr>
+        <tr>
+          <td>Итого</td>
+          <td>
+            <code>py -X utf8 -m pytest tests -q</code>
+          </td>
+          <td>
+            <span class="badge ok">24 passed</span>
+          </td>
+        </tr>
+      </table>
+      <h3>11.5 Команды</h3>
+      <table>
+        <tr>
+          <th>Задача</th>
+          <th>Команда</th>
+          <th>Описание</th>
+        </tr>
+        <tr>
+          <td>Пайплайн целиком</td>
+          <td>
+            <code>py -X utf8 scripts/run_all.py</code>
+          </td>
+          <td>парсинг → чистка → признаки → задачи → обучение → отчёт</td>
+        </tr>
+        <tr>
+          <td>Тесты</td>
+          <td>
+            <code>py -X utf8 -m pytest tests -q</code>
+          </td>
+          <td>24 теста</td>
+        </tr>
+        <tr>
+          <td>Проверка утечек</td>
+          <td>
+            <code>py -X utf8 scripts/check_leakage.py</code>
+          </td>
+          <td>вердикты по утечкам (признаки/лаги/scaler/split)</td>
+        </tr>
+        <tr>
+          <td>Отчёт md+html</td>
+          <td>
+            <code>py -X utf8 scripts/build_html_report.py</code>
+          </td>
+          <td>регенерация reports/lab1_report.html из md</td>
+        </tr>
+        <tr>
+          <td>Базовые предсказатели</td>
+          <td>
+            <code>py -X utf8 scripts/run_baselines.py</code>
+          </td>
+          <td>обучает константу/линейную регрессию/Random Forest, пишет metrics_baselines_*.json и summary_baselines.json</td>
+        </tr>
+        <tr>
+          <td>График сравнения с baseline</td>
+          <td>
+            <code>py -X utf8 scripts/run_baseline_chart.py</code>
+          </td>
+          <td>строит figures/baseline_comparison.png из уже посчитанного summary_baselines.json</td>
+        </tr>
+        <tr>
+          <td>Документы md → HTML</td>
+          <td>
+            <code>py -X utf8 scripts/build_doc_html.py</code>
+          </td>
+          <td>регенерация docs/lab1_likbez.html и docs/lab1_defense.html из md (pandoc + style_likbez.css)</td>
+        </tr>
+        <tr>
+          <td>Документ «Структура работы»</td>
+          <td>
+            <code>py -X utf8 scripts/build_structure_doc.py</code>
+          </td>
+          <td>сборка docs/project_structure.md/.docx/.pdf из фактического состояния репозитория</td>
+        </tr>
+        <tr>
+          <td>XML → HTML (эта схема)</td>
+          <td>
+            <code>py -X utf8 scripts/xml_to_html.py</code>
+          </td>
+          <td>валидация XSD + XSLT → docs/lab1_process.html</td>
+        </tr>
+      </table>
+    </section>
+    <footer>
+      <p>Сгенерировано из <code>docs/lab1_process.xml</code> через <code>scripts/xml_to_html.py</code> (lxml XSLT). Все ресурсы локальные.</p>
+      <p>
+        <a href="#top">↑ Наверх</a>
+      </p>
+    </footer>
+  </body>
+</html>

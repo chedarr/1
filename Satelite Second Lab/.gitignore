@@ -1,0 +1,48 @@
+# --- Python ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Сырые и производные данные: в Git не хранятся ---
+data/raw/
+data/interim/
+data/processed/
+dataset_matlab/
+dataset_text/
+*.mat
+*.xls
+*.xlsx
+
+# --- Служебные экспорты Visio (не код лабы) ---
+AdaptHTMLdiagrams/
+
+# --- Бэкапы, архивы, веса моделей ---
+backups/
+*.7z
+*.zip
+*.keras
+*.h5
+*.pkl
+*.joblib
+
+# --- Логи и временные файлы ---
+*.log
+logs/
+checkpoints/
+
+# --- Прочее ---
+.env
+
+# ============================================================
+# ШАБЛОНЫ И НОВЫЕ ДОКУМЕНТЫ (не коммитим)
+# ============================================================
+templates/
+docs_new/

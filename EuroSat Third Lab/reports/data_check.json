@@ -1,0 +1,49 @@
+{
+ "n_images": 27000,
+ "n_classes": 10,
+ "class_names": [
+  "AnnualCrop",
+  "Forest",
+  "HerbaceousVegetation",
+  "Highway",
+  "Industrial",
+  "Pasture",
+  "PermanentCrop",
+  "Residential",
+  "River",
+  "SeaLake"
+ ],
+ "image_shape": [
+  64,
+  64,
+  3
+ ],
+ "dtype": "uint8",
+ "class_distribution": {
+  "AnnualCrop": 3000,
+  "Forest": 3000,
+  "HerbaceousVegetation": 3000,
+  "Highway": 2500,
+  "Industrial": 2500,
+  "Pasture": 2000,
+  "PermanentCrop": 2500,
+  "Residential": 3000,
+  "River": 2500,
+  "SeaLake": 3000
+ },
+ "license": "MIT (Zenodo 7711810); Sentinel-2 imagery - Copernicus Sentinel Data Terms",
+ "alternative_rejected": [
+  {
+   "name": "eurosat/all",
+   "reason": "13 каналов, архив около 2.07 ГБ; постановка RGB, каналы не нужны"
+  },
+  {
+   "name": "Kaggle Satellite Image Classification Dataset",
+   "reason": "тот же EuroSAT в другой упаковке, преимуществ нет"
+  }
+ ],
+ "potential_overlap": {
+  "possible": true,
+  "reason": "патчи нарезаны из более крупных сцен Sentinel-2; идентификатор сцены в данных не сохранён, поэтому пересечение по сцене нельзя исключить"
+ }
+}

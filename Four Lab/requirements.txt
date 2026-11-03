@@ -1,0 +1,8 @@
+# Версии зафиксированы по локальному окружению (Python 3.13.15, CPU).
+tensorflow==2.20.0
+pandas==3.0.6
+numpy==2.5.3
+scikit-learn==1.9.1
+matplotlib==3.11.2
+pyarrow==25.0.1
+pytest==9.1.1

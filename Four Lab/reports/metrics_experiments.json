@@ -1,0 +1,400 @@
+{
+ "runs": [
+  {
+   "key": "A",
+   "label": "A_базовая",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 24752,
+   "epochs_ran": 22,
+   "best_epoch": 14,
+   "training_time_sec": 256.8,
+   "val": {
+    "mae": 0.0809949514444369,
+    "rmse": 0.13963570478833648,
+    "r2": 0.9394537601653989
+   },
+   "test": {
+    "mae": 0.19847719727758936,
+    "rmse": 0.32644179589932565,
+    "r2": 0.7810029438780146,
+    "skill_score": 0.7066030953418765
+   }
+  },
+  {
+   "key": "B",
+   "label": "B_одномерная",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": true,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 23728,
+   "epochs_ran": 27,
+   "best_epoch": 19,
+   "training_time_sec": 315.4,
+   "val": {
+    "mae": 0.08442694882267532,
+    "rmse": 0.14897736849225698,
+    "r2": 0.9310813409610863
+   },
+   "test": {
+    "mae": 0.2215087263955898,
+    "rmse": 0.3612476043929056,
+    "r2": 0.731811396606481,
+    "skill_score": 0.6725569709232919
+   }
+  },
+  {
+   "key": "C",
+   "label": "C_двухслойная",
+   "config": {
+    "arch": "lstm2",
+    "units": 64,
+    "dense": null,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 35088,
+   "epochs_ran": 30,
+   "best_epoch": 27,
+   "training_time_sec": 591.0,
+   "val": {
+    "mae": 0.08057882207134777,
+    "rmse": 0.14427769340533989,
+    "r2": 0.9353563529569399
+   },
+   "test": {
+    "mae": 0.20595090767944785,
+    "rmse": 0.3381905186095537,
+    "r2": 0.7649541349022937,
+    "skill_score": 0.6955551587109006
+   }
+  },
+  {
+   "key": "D",
+   "label": "D_большая",
+   "config": {
+    "arch": "lstm1",
+    "units": 128,
+    "dense": 64,
+    "dropout": 0.2,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 86224,
+   "epochs_ran": 30,
+   "best_epoch": 28,
+   "training_time_sec": 668.9,
+   "val": {
+    "mae": 0.06971437048432937,
+    "rmse": 0.13544823030486886,
+    "r2": 0.943014752522726
+   },
+   "test": {
+    "mae": 0.19064104556575195,
+    "rmse": 0.3293828501633771,
+    "r2": 0.7770507716765749,
+    "skill_score": 0.7181868071647971
+   }
+  },
+  {
+   "key": "E",
+   "label": "E_GRU",
+   "config": {
+    "arch": "gru",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 20464,
+   "epochs_ran": 30,
+   "best_epoch": 26,
+   "training_time_sec": 354.1,
+   "val": {
+    "mae": 0.0744041277997068,
+    "rmse": 0.1382858245707537,
+    "r2": 0.9406120744430793
+   },
+   "test": {
+    "mae": 0.19649367577587626,
+    "rmse": 0.3331290917326962,
+    "r2": 0.7719519032350021,
+    "skill_score": 0.7095352158922867
+   }
+  },
+  {
+   "key": "F",
+   "label": "F_L2",
+   "config": {
+    "arch": "l2",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 24752,
+   "epochs_ran": 24,
+   "best_epoch": 16,
+   "training_time_sec": 244.6,
+   "val": {
+    "mae": 0.08027363592954376,
+    "rmse": 0.14267367538099118,
+    "r2": 0.936783871260856
+   },
+   "test": {
+    "mae": 0.2006772931180204,
+    "rmse": 0.3308501760281523,
+    "r2": 0.7750526687457101,
+    "skill_score": 0.7033508259709478
+   }
+  },
+  {
+   "key": "G",
+   "label": "G_BatchNorm",
+   "config": {
+    "arch": "batchnorm",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 25008,
+   "epochs_ran": 27,
+   "best_epoch": 19,
+   "training_time_sec": 315.7,
+   "val": {
+    "mae": 0.08018857293341865,
+    "rmse": 0.14218806032177955,
+    "r2": 0.9372179849206154
+   },
+   "test": {
+    "mae": 0.1930919683117307,
+    "rmse": 0.32823744299064356,
+    "r2": 0.7786142513799299,
+    "skill_score": 0.7145637554636959
+   }
+  },
+  {
+   "key": "E0",
+   "label": "E_без_dropout",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.0,
+    "lookback": 144,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 24752,
+   "epochs_ran": 30,
+   "best_epoch": 27,
+   "training_time_sec": 480.9,
+   "val": {
+    "mae": 0.07394415825728899,
+    "rmse": 0.1411259057167836,
+    "r2": 0.9381427693841746
+   },
+   "test": {
+    "mae": 0.20137035037469816,
+    "rmse": 0.33831407020148135,
+    "r2": 0.7647886789491691,
+    "skill_score": 0.7023263211076727
+   }
+  },
+  {
+   "key": "lb72",
+   "label": "lookback_72",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 72,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 24752,
+   "epochs_ran": 30,
+   "best_epoch": 27,
+   "training_time_sec": 158.2,
+   "val": {
+    "mae": 0.0755643318683886,
+    "rmse": 0.13898506220259757,
+    "r2": 0.9400370542978567
+   },
+   "test": {
+    "mae": 0.19061863366589388,
+    "rmse": 0.3197873800475229,
+    "r2": 0.7896231947134466,
+    "skill_score": 0.7178287913868988
+   }
+  },
+  {
+   "key": "lb288",
+   "label": "lookback_288",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 288,
+    "horizon": 144,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 24752,
+   "epochs_ran": 18,
+   "best_epoch": 10,
+   "training_time_sec": 339.8,
+   "val": {
+    "mae": 0.0876494331762586,
+    "rmse": 0.14473837686366653,
+    "r2": 0.9348872227062578
+   },
+   "test": {
+    "mae": 0.1991479180641266,
+    "rmse": 0.3191067194973806,
+    "r2": 0.7911743957959582,
+    "skill_score": 0.7061964832491304
+   }
+  },
+  {
+   "key": "hz72",
+   "label": "horizon_72",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 72,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 22376,
+   "epochs_ran": 30,
+   "best_epoch": 28,
+   "training_time_sec": 358.7,
+   "val": {
+    "mae": 0.05043750574848116,
+    "rmse": 0.0860925913169356,
+    "r2": 0.9769827004494446
+   },
+   "test": {
+    "mae": 0.12200690031568175,
+    "rmse": 0.20691297510855358,
+    "r2": 0.911979053686439,
+    "skill_score": 0.8197716164024028
+   }
+  },
+  {
+   "key": "hz28",
+   "label": "horizon_28",
+   "config": {
+    "arch": "lstm1",
+    "units": 64,
+    "dense": 32,
+    "dropout": 0.1,
+    "lookback": 144,
+    "horizon": 28,
+    "stride": 12,
+    "univariate": false,
+    "batch_size": 128,
+    "lr": 0.001,
+    "patience": 8,
+    "epochs_requested": 30
+   },
+   "params": 20924,
+   "epochs_ran": 30,
+   "best_epoch": 29,
+   "training_time_sec": 449.3,
+   "val": {
+    "mae": 0.03320275906849331,
+    "rmse": 0.05343406233563832,
+    "r2": 0.9911405782107777
+   },
+   "test": {
+    "mae": 0.08120699089950656,
+    "rmse": 0.13786961505261885,
+    "r2": 0.9608874520230747,
+    "skill_score": 0.8782326404476085
+   }
+  }
+ ]
+}

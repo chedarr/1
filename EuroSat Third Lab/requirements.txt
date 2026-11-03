@@ -1,0 +1,9 @@
+tensorflow==2.20.0
+tensorflow-datasets==4.9.10
+scikit-learn==1.9.1
+scikit-image==0.26.0
+pandas==3.0.6
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
+pytest==9.1.1

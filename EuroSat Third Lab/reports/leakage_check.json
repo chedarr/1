@@ -1,0 +1,9 @@
+{
+ "overlap_train_val": [],
+ "overlap_train_test": [],
+ "overlap_val_test": [],
+ "normalization_only_train": true,
+ "augmentation_only_train": true,
+ "normalization_source": "train",
+ "augmentation_scope": "train"
+}

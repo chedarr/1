@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XSD-схема полного процесса лабораторной работы №1 (NASA Battery, регрессия) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <!-- ================================ METADATA ================================ -->
+  <xs:element name="metadata">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="title" type="xs:string"/>
+        <xs:element name="author" type="xs:string"/>
+        <xs:element name="date" type="xs:string"/>
+        <xs:element name="dataset" type="xs:string"/>
+        <xs:element name="n_batteries" type="xs:integer"/>
+        <xs:element name="n_discharge_cycles" type="xs:integer"/>
+        <xs:element name="task_type" type="xs:string"/>
+        <xs:element name="stack" type="xs:string"/>
+        <xs:element name="seed" type="xs:integer"/>
+        <xs:element name="version" type="xs:string"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ CHRONOLOGY ================================ -->
+  <xs:complexType name="inputsType">
+    <xs:sequence>
+      <xs:element name="input" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="outputsType">
+    <xs:sequence>
+      <xs:element name="output" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stageFilesType">
+    <xs:sequence>
+      <xs:element name="file" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- формула-ссылка внутри этапа: атрибут id + краткая запись текстом -->
+  <xs:complexType name="stageFormulaType" mixed="true">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="stageFormulasType">
+    <xs:sequence>
+      <xs:element name="formula" type="stageFormulaType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stageRefsType">
+    <xs:sequence>
+      <xs:element name="ref" maxOccurs="unbounded">
+        <xs:complexType mixed="true">
+          <xs:attribute name="href" type="xs:string" use="optional"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="stageType">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="inputs" type="inputsType"/>
+        <xs:element name="outputs" type="outputsType"/>
+        <xs:element name="files" type="stageFilesType"/>
+        <xs:element name="formulas" type="stageFormulasType"/>
+        <xs:element name="refs" type="stageRefsType"/>
+        <xs:element name="duration" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:integer" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="chronology">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="stage" type="stageType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ ENTITIES ================================ -->
+  <!-- Сущности: «мешок» типизированных элементов (детерминированная модель XSD 1.0);
+     обязательность/состав полей по типу сущности проверяется скриптом xml_to_html.py -->
+  <xs:complexType name="entityType">
+    <xs:sequence>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="id" type="xs:string"/>
+        <xs:element name="ambient_temp" type="xs:decimal"/>
+        <xs:element name="total_cycles" type="xs:integer"/>
+        <xs:element name="category" type="xs:string"/>
+        <xs:element name="name" type="xs:string"/>
+        <xs:element name="architecture" type="xs:string"/>
+        <xs:element name="params" type="xs:integer"/>
+        <xs:element name="loss" type="xs:string"/>
+        <xs:element name="metric" type="xs:string"/>
+        <xs:element name="source" type="xs:string"/>
+        <xs:element name="unit" type="xs:string"/>
+        <xs:element name="formula" type="xs:string"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="type" use="required">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="battery"/>
+          <xs:enumeration value="feature"/>
+          <xs:enumeration value="target"/>
+          <xs:enumeration value="model"/>
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:element name="entities">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="entity" type="entityType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ FILES ================================ -->
+  <xs:complexType name="fileType">
+    <xs:sequence>
+      <xs:element name="path" type="xs:string"/>
+      <xs:element name="type" type="xs:string"/>
+      <xs:element name="rows" type="xs:integer" minOccurs="0"/>
+      <xs:element name="cols" type="xs:integer" minOccurs="0"/>
+      <xs:element name="content" type="xs:string" minOccurs="0"/>
+      <xs:element name="created_by" type="xs:string" minOccurs="0"/>
+      <xs:element name="used_by" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="files">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="file" type="fileType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ FORMULAS ================================ -->
+  <xs:complexType name="formulaFullType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="latex" type="xs:string"/>
+      <xs:element name="plain" type="xs:string"/>
+      <xs:element name="used_in" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="formulas">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="formula" type="formulaFullType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ PROCESSES ================================ -->
+  <xs:complexType name="processStepsType">
+    <xs:sequence>
+      <xs:element name="step" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processRulesType">
+    <xs:sequence>
+      <xs:element name="rule" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processFeaturesType">
+    <xs:sequence>
+      <xs:element name="feature" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="paramType" mixed="true">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="processHyperparamsType">
+    <xs:sequence>
+      <xs:element name="param" type="paramType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processRefsType">
+    <xs:sequence>
+      <xs:element name="ref" type="xs:string" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="processType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="inputs" type="inputsType"/>
+        <xs:element name="outputs" type="outputsType"/>
+        <xs:element name="steps" type="processStepsType"/>
+        <xs:element name="rules" type="processRulesType"/>
+        <xs:element name="features" type="processFeaturesType"/>
+        <xs:element name="hyperparams" type="processHyperparamsType"/>
+        <xs:element name="refs" type="processRefsType"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="processes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="process" type="processType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ CHECKS ================================ -->
+  <xs:complexType name="checkType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+      <xs:element name="script" type="xs:string" minOccurs="0"/>
+      <xs:element name="metric" type="xs:string" minOccurs="0"/>
+      <xs:element name="status" type="checkStatusType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:simpleType name="checkStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PASSED"/>
+      <xs:enumeration value="FAILED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:element name="checks">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="check" type="checkType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ RESULTS ================================ -->
+  <xs:complexType name="metricValueType" mixed="true">
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="metricsType">
+    <xs:sequence>
+      <xs:element name="metric" type="metricValueType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="batteryScoreType" mixed="true">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="perBatteryType">
+    <xs:sequence>
+      <xs:element name="battery" type="batteryScoreType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="resultType">
+    <xs:sequence>
+      <xs:element name="target" type="xs:string"/>
+      <xs:element name="n_batteries" type="xs:integer"/>
+      <xs:element name="n_train" type="xs:integer" minOccurs="0"/>
+      <xs:element name="n_val" type="xs:integer" minOccurs="0"/>
+      <xs:element name="n_test" type="xs:integer" minOccurs="0"/>
+      <xs:element name="metrics" type="metricsType"/>
+      <xs:element name="per_battery" type="perBatteryType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="task" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="results">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="result" type="resultType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ BASELINES ================================ -->
+  <xs:complexType name="taskScoreType">
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="r2" type="xs:decimal" use="required"/>
+    <xs:attribute name="mae" type="xs:decimal" use="optional"/>
+    <xs:attribute name="rmse" type="xs:decimal" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="baselineMetricsType">
+    <xs:sequence>
+      <xs:element name="task" type="taskScoreType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="baselineType">
+    <xs:sequence>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="metrics" type="baselineMetricsType" minOccurs="0"/>
+      <xs:element name="note" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+    <xs:attribute name="name" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="baselines">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="baseline" type="baselineType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ REFERENCES ================================ -->
+  <xs:complexType name="referenceType">
+    <xs:sequence>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="url" type="xs:string"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="references">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="ref" type="referenceType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ APPENDIX ================================ -->
+  <xs:complexType name="appendixRowType">
+    <xs:sequence>
+      <xs:element name="cell" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixMetricsTableType">
+    <xs:sequence>
+      <xs:element name="row" type="appendixRowType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixGraphType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string"/>
+      <xs:element name="title" type="xs:string"/>
+      <xs:element name="file" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixGraphsType">
+    <xs:sequence>
+      <xs:element name="graph" type="appendixGraphType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixTestType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="pytest_id" type="xs:string" minOccurs="0"/>
+      <xs:element name="result" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixTestsType">
+    <xs:sequence>
+      <xs:element name="test" type="appendixTestType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixCommandType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="cmd" type="xs:string"/>
+      <xs:element name="description" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixCommandsType">
+    <xs:sequence>
+      <xs:element name="command" type="appendixCommandType" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="appendixFilesTreeType">
+    <xs:sequence>
+      <xs:element name="pre" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="appendix">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="files_tree" type="appendixFilesTreeType"/>
+        <xs:element name="metrics_table" type="appendixMetricsTableType"/>
+        <xs:element name="graphs_list" type="appendixGraphsType"/>
+        <xs:element name="tests_list" type="appendixTestsType"/>
+        <xs:element name="commands" type="appendixCommandsType"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <!-- ================================ ROOT ================================ -->
+  <xs:element name="lab1_process">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="metadata"/>
+        <xs:element ref="chronology"/>
+        <xs:element ref="entities"/>
+        <xs:element ref="files"/>
+        <xs:element ref="formulas"/>
+        <xs:element ref="processes"/>
+        <xs:element ref="checks"/>
+        <xs:element ref="results"/>
+        <xs:element ref="baselines"/>
+        <xs:element ref="references"/>
+        <xs:element ref="appendix"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

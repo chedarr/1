@@ -1,0 +1,151 @@
+/* ============ docs/lab1_process.css — стили XML-схемы процесса ============ */
+* { box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fafbfc;
+  color: #1f2933;
+  line-height: 1.55;
+}
+
+h1, h2, h3 { color: #2c3e50; }
+h1 { border-bottom: 3px solid #2c3e50; padding-bottom: 8px; }
+h2 { color: #34495e; border-bottom: 1px solid #d0d7de; padding-bottom: 6px; margin-top: 40px; }
+h3 { color: #44596e; margin-top: 24px; }
+
+header#top { margin-bottom: 8px; }
+p.meta { color: #7b8794; font-size: 0.95em; }
+
+/* ============ навигация ============ */
+nav.toc {
+  background: #eef2f7;
+  border: 1px solid #dde3ea;
+  border-radius: 8px;
+  padding: 12px 20px;
+  margin: 20px 0;
+}
+nav.toc h2 { margin: 0 0 8px 0; border: none; font-size: 1.05em; }
+nav.toc ol { margin: 0; padding-left: 22px; columns: 2; }
+nav.toc li { margin: 3px 0; }
+nav.toc a { color: #2456a6; text-decoration: none; }
+nav.toc a:hover { text-decoration: underline; }
+
+/* ============ таблицы ============ */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 10px 0 20px;
+  background: #ffffff;
+  font-size: 0.93em;
+}
+th, td {
+  border: 1px solid #d0d7de;
+  padding: 8px 10px;
+  vertical-align: top;
+  text-align: left;
+}
+th {
+  background: #2c3e50;
+  color: #ffffff;
+  font-weight: 600;
+}
+tr:nth-child(even) td { background: #f5f7fa; }
+table.kv td:first-child { width: 30%; font-weight: 600; background: #eef2f7; }
+
+/* ============ этапы (хронология, процессы, версии) ============ */
+.stage {
+  background: #ffffff;
+  border: 1px solid #dde3ea;
+  border-left: 4px solid #2c3e50;
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin: 12px 0;
+}
+.stage h3 { margin: 0 0 6px 0; }
+.stage .desc { margin: 4px 0; color: #3e4c59; }
+.stage.version { border-left-color: #7c5cbf; }
+
+p.io { margin: 6px 0; font-size: 0.93em; }
+.io-item {
+  display: inline-block;
+  background: #eef2f7;
+  border-radius: 4px;
+  padding: 1px 7px;
+  margin: 2px 4px 2px 0;
+}
+p.dur { margin: 6px 0; font-size: 0.9em; color: #52606d; }
+
+ol.steps, ul.rules { margin: 6px 0 6px 20px; }
+ol.steps li, ul.rules li { margin: 2px 0; }
+
+/* ============ код / формулы ============ */
+code {
+  font-family: Consolas, 'Cascadia Code', monospace;
+  background: #eef2f7;
+  border-radius: 4px;
+  padding: 1px 5px;
+  font-size: 0.92em;
+  word-break: break-all;
+}
+.formula {
+  display: inline-block;
+  background: #f4f4f4;
+  padding: 3px 8px;
+  margin: 2px 0;
+}
+pre.tree {
+  font-family: Consolas, 'Cascadia Code', monospace;
+  background: #1e293b;
+  color: #d7e2ee;
+  padding: 14px 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 0.85em;
+  line-height: 1.45;
+  white-space: pre;
+}
+
+/* ============ статусы / проверки ============ */
+.badge {
+  display: inline-block;
+  font-weight: 700;
+  border-radius: 4px;
+  padding: 1px 8px;
+  font-size: 0.9em;
+}
+.badge.ok  { color: #1a7f37; background: #dcf5e3; }
+.badge.bad { color: #b42318; background: #fdeceb; }
+
+p.note {
+  background: #fdf6e3;
+  border-left: 4px solid #b58900;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.93em;
+}
+
+/* ============ ссылки ============ */
+ul.refs { padding-left: 20px; }
+ul.refs li { margin: 4px 0; }
+a { color: #2456a6; }
+a.local { text-decoration: none; }
+a.local:hover { text-decoration: underline; }
+a[href^="http"] { text-decoration: none; border-bottom: 1px dashed #7b8794; }
+
+footer {
+  margin-top: 40px;
+  border-top: 1px solid #d0d7de;
+  padding-top: 12px;
+  color: #7b8794;
+  font-size: 0.88em;
+}
+
+@media (max-width: 768px) {
+  body { padding: 10px; }
+  nav.toc ol { columns: 1; }
+  table { font-size: 0.85em; }
+  th, td { padding: 5px 6px; }
+}

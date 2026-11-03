@@ -1,0 +1,573 @@
+{
+ "method": "cosine similarity между 128-мерными эмбеддингами test и train",
+ "model": "reports\\control_patience_max\\eurosat_cnn_patience_max.keras",
+ "layer": "dense",
+ "embedding_dim": 128,
+ "n_train": 18900,
+ "n_test": 4050,
+ "top1_similarity": {
+  "min": 0.761642,
+  "mean": 0.983337,
+  "median": 0.990466,
+  "p95": 0.999604,
+  "max": 0.999985
+ },
+ "counts_above": {
+  "gt_0.95": 3768,
+  "gt_0.99": 2089,
+  "gt_0.999": 362
+ },
+ "control_random_pairs": {
+  "n_pairs": 200000,
+  "mean": 0.305467,
+  "median": 0.242335,
+  "p95": 0.847912,
+  "max": 0.99992
+ },
+ "control_train_top1": {
+  "n_sample": 1000,
+  "median": 0.991372,
+  "p95": 0.999666,
+  "max": 0.999987
+ },
+ "top1_minus_random_mean": 0.677869,
+ "phash_near_duplicates": {
+  "method": "dHash 64 бита (9x8 градиенты), расстояние Хэмминга",
+  "min_hamming_min": 0,
+  "min_hamming_median": 14,
+  "pairs_le_4_bits": 179,
+  "pairs_le_2_bits": 116,
+  "exact_duplicates": 66,
+  "classes_le_4_bits": {
+   "SeaLake": 174,
+   "AnnualCrop": 2,
+   "Forest": 2,
+   "River": 1
+  },
+  "mad_lt_5_class_share": {
+   "SeaLake": 55
+  },
+  "mad_lt_5_same_class": 55,
+  "near_duplicate_pairs": [
+   {
+    "test_index": 21,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.253
+   },
+   {
+    "test_index": 207,
+    "train_index": 6241,
+    "class": "SeaLake",
+    "hamming": 4,
+    "pixel_mad": 3.215
+   },
+   {
+    "test_index": 848,
+    "train_index": 5659,
+    "class": "SeaLake",
+    "hamming": 3,
+    "pixel_mad": 1.427
+   },
+   {
+    "test_index": 1131,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.271
+   },
+   {
+    "test_index": 1733,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.238
+   },
+   {
+    "test_index": 1849,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.264
+   },
+   {
+    "test_index": 2389,
+    "train_index": 6129,
+    "class": "SeaLake",
+    "hamming": 1,
+    "pixel_mad": 1.992
+   },
+   {
+    "test_index": 3293,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 4.155
+   },
+   {
+    "test_index": 3518,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.265
+   },
+   {
+    "test_index": 5658,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.265
+   },
+   {
+    "test_index": 6369,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.247
+   },
+   {
+    "test_index": 6370,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.197
+   },
+   {
+    "test_index": 7255,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.127
+   },
+   {
+    "test_index": 7879,
+    "train_index": 37,
+    "class": "SeaLake",
+    "hamming": 4,
+    "pixel_mad": 4.252
+   },
+   {
+    "test_index": 7990,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.431
+   },
+   {
+    "test_index": 8354,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.104
+   },
+   {
+    "test_index": 9144,
+    "train_index": 9963,
+    "class": "SeaLake",
+    "hamming": 4,
+    "pixel_mad": 4.291
+   },
+   {
+    "test_index": 9180,
+    "train_index": 2938,
+    "class": "SeaLake",
+    "hamming": 2,
+    "pixel_mad": 2.886
+   },
+   {
+    "test_index": 9794,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.254
+   },
+   {
+    "test_index": 9935,
+    "train_index": 7128,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.389
+   },
+   {
+    "test_index": 10297,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 2.714
+   },
+   {
+    "test_index": 10346,
+    "train_index": 8849,
+    "class": "SeaLake",
+    "hamming": 2,
+    "pixel_mad": 3.139
+   },
+   {
+    "test_index": 10668,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.349
+   },
+   {
+    "test_index": 10909,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 4.534
+   },
+   {
+    "test_index": 11263,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.26
+   },
+   {
+    "test_index": 12761,
+    "train_index": 676,
+    "class": "SeaLake",
+    "hamming": 1,
+    "pixel_mad": 2.58
+   },
+   {
+    "test_index": 14821,
+    "train_index": 13746,
+    "class": "SeaLake",
+    "hamming": 3,
+    "pixel_mad": 1.368
+   },
+   {
+    "test_index": 16002,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.309
+   },
+   {
+    "test_index": 17142,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 4.43
+   },
+   {
+    "test_index": 17166,
+    "train_index": 676,
+    "class": "SeaLake",
+    "hamming": 4,
+    "pixel_mad": 2.132
+   },
+   {
+    "test_index": 17379,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.242
+   },
+   {
+    "test_index": 18009,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.473
+   },
+   {
+    "test_index": 18572,
+    "train_index": 19368,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.914
+   },
+   {
+    "test_index": 19188,
+    "train_index": 2971,
+    "class": "SeaLake",
+    "hamming": 2,
+    "pixel_mad": 1.883
+   },
+   {
+    "test_index": 19216,
+    "train_index": 4460,
+    "class": "SeaLake",
+    "hamming": 3,
+    "pixel_mad": 2.398
+   },
+   {
+    "test_index": 20121,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.229
+   },
+   {
+    "test_index": 20664,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.118
+   },
+   {
+    "test_index": 21585,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.026
+   },
+   {
+    "test_index": 21631,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.248
+   },
+   {
+    "test_index": 21736,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.228
+   },
+   {
+    "test_index": 22084,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.227
+   },
+   {
+    "test_index": 22124,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.304
+   },
+   {
+    "test_index": 23109,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.203
+   },
+   {
+    "test_index": 23298,
+    "train_index": 7128,
+    "class": "SeaLake",
+    "hamming": 1,
+    "pixel_mad": 3.259
+   },
+   {
+    "test_index": 23571,
+    "train_index": 13783,
+    "class": "SeaLake",
+    "hamming": 1,
+    "pixel_mad": 2.899
+   },
+   {
+    "test_index": 24125,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 3.108
+   },
+   {
+    "test_index": 24314,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.248
+   },
+   {
+    "test_index": 24456,
+    "train_index": 9739,
+    "class": "SeaLake",
+    "hamming": 3,
+    "pixel_mad": 4.078
+   },
+   {
+    "test_index": 24541,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.248
+   },
+   {
+    "test_index": 24953,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.387
+   },
+   {
+    "test_index": 26531,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.359
+   },
+   {
+    "test_index": 26626,
+    "train_index": 23175,
+    "class": "SeaLake",
+    "hamming": 3,
+    "pixel_mad": 2.623
+   },
+   {
+    "test_index": 26649,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 2.485
+   },
+   {
+    "test_index": 26950,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.549
+   },
+   {
+    "test_index": 26994,
+    "train_index": 136,
+    "class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.29
+   }
+  ],
+  "pixel_mad_for_le_4_bits": {
+   "n_pairs": 179,
+   "min": 1.197,
+   "median": 9.196,
+   "lt_5": 55,
+   "lt_10": 99
+  },
+  "examples_le_2_bits": [
+   {
+    "test_index": 21,
+    "test_class": "SeaLake",
+    "train_index": 136,
+    "train_class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.253
+   },
+   {
+    "test_index": 783,
+    "test_class": "SeaLake",
+    "train_index": 21714,
+    "train_class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 10.139
+   },
+   {
+    "test_index": 1131,
+    "test_class": "SeaLake",
+    "train_index": 136,
+    "train_class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 1.271
+   },
+   {
+    "test_index": 1420,
+    "test_class": "SeaLake",
+    "train_index": 5820,
+    "train_class": "SeaLake",
+    "hamming": 2,
+    "pixel_mad": 17.037
+   },
+   {
+    "test_index": 1597,
+    "test_class": "SeaLake",
+    "train_index": 136,
+    "train_class": "SeaLake",
+    "hamming": 0,
+    "pixel_mad": 67.132
+   }
+  ]
+ },
+ "same_class_share_above_0.95": 0.9318,
+ "top_pairs": [
+  {
+   "test_index": 3518,
+   "test_class": "SeaLake",
+   "train_index": 7778,
+   "train_class": "SeaLake",
+   "similarity": 0.999985,
+   "same_class": true
+  },
+  {
+   "test_index": 23571,
+   "test_class": "SeaLake",
+   "train_index": 11681,
+   "train_class": "SeaLake",
+   "similarity": 0.999985,
+   "same_class": true
+  },
+  {
+   "test_index": 5739,
+   "test_class": "SeaLake",
+   "train_index": 2224,
+   "train_class": "SeaLake",
+   "similarity": 0.999983,
+   "same_class": true
+  },
+  {
+   "test_index": 17379,
+   "test_class": "SeaLake",
+   "train_index": 7778,
+   "train_class": "SeaLake",
+   "similarity": 0.999982,
+   "same_class": true
+  },
+  {
+   "test_index": 7118,
+   "test_class": "SeaLake",
+   "train_index": 704,
+   "train_class": "SeaLake",
+   "similarity": 0.999981,
+   "same_class": true
+  },
+  {
+   "test_index": 14319,
+   "test_class": "SeaLake",
+   "train_index": 25825,
+   "train_class": "SeaLake",
+   "similarity": 0.99998,
+   "same_class": true
+  },
+  {
+   "test_index": 1849,
+   "test_class": "SeaLake",
+   "train_index": 136,
+   "train_class": "SeaLake",
+   "similarity": 0.999978,
+   "same_class": true
+  },
+  {
+   "test_index": 11308,
+   "test_class": "SeaLake",
+   "train_index": 15508,
+   "train_class": "SeaLake",
+   "similarity": 0.999976,
+   "same_class": true
+  },
+  {
+   "test_index": 24951,
+   "test_class": "SeaLake",
+   "train_index": 1753,
+   "train_class": "SeaLake",
+   "similarity": 0.999976,
+   "same_class": true
+  },
+  {
+   "test_index": 13809,
+   "test_class": "SeaLake",
+   "train_index": 13558,
+   "train_class": "SeaLake",
+   "similarity": 0.999976,
+   "same_class": true
+  }
+ ],
+ "caveat": "Косвенная оценка, не доказательство: CNN обучена на train, поэтому высокая similarity ожидаема и для разных классов. scene_id в датасете нет.",
+ "seconds": 14.0
+}

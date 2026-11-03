@@ -1,0 +1,50 @@
+[
+  {
+    "battery_id": "B0005",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0007",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0018",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0025",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0026",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0027",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0028",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0029",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0030",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0031",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0032",
+    "reason": "no_crossing_censored"
+  },
+  {
+    "battery_id": "B0038",
+    "reason": "no_crossing_censored"
+  }
+]
