@@ -1,0 +1,15 @@
+# Archives and compressed data
+*.7z
+*.zip
+*.rar
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.bz2
+*.xz
+*.zst
+*.lz
+*.lzma
+*.cab
+*.iso
